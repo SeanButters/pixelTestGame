@@ -9,22 +9,25 @@ Uint32 rgbMult(Uint32 rgb, float factor) {
 	return r << 24 | g << 16 | b << 16;
 }
 
+//Calculates the  squared distance betwee
 float calcDistance(int x0, int y0, int x1, int y1) {
-	return sqrt(abs(((x1 - x0) * (x1 - x0)) + ((y1 - y0) * (y1 - y0))));
+	return abs(((x1 - x0) * (x1 - x0)) + ((y1 - y0) * (y1 - y0)));
 }
 
+//Calculate invsere of distance
 float inverseSquare(float dist) {
 	//scale
-	float val = 1 + (dist / 100);
+	float val = 1 + (dist / 5000);
 
 	//inverse square
-	val = (1 / (val * val));
+	val = (1 / (val));
 
 	if (val > 1.0) val = 1.0;
 	if (val < 0.0) val = 0.0;
 	return val;
 }
 
+//Hold pixel color data
 struct pixel {
 	bool valid;
 	Uint32 rgb;
@@ -35,6 +38,8 @@ struct pixel {
 	}
 };
 
+
+//Keeps track of currently held down butttons
 struct keylog {
 	bool left;
 	bool right;
@@ -73,6 +78,7 @@ struct gameVars {
 	Uint16 window_width, window_height;		  // window resolution
 	bool isRunning;							  // game window running
 	bool lighting;							  // game lighting
+	bool FPSshow;							  // FPS counter in console
 	bool painting;
 	bool unpainting;
 	int brushSize;
