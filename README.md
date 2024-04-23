@@ -1,5 +1,5 @@
 # pixelTestGame
-An interactive 2D graphics demo I made to showcase CPU based raytraced lighting and CPU based rendering for an interactive 2D voxel implementation.
+An interactive 2D graphics demo I made to showcase CPU based raytraced lighting and CPU based rendering for an interactive 2D voxel system
 
 ## Controls
 Left click to draw walls
@@ -15,3 +15,6 @@ Control Movement using arrow keys or WASD
 Turn lighting on and off using L (default=off)
 
 Turn FPS counter in console on and of using p (default=on)
+
+## TODO
+Redesign foreground voxel layer, using a quad-tree to when passing through empty space
