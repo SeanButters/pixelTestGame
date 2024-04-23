@@ -1,12 +1,13 @@
 #include "globals.h"
 #include <iostream> 
 
-
+//Method for generating world
 void generateWorld() {
 	pixel temp;
 	temp.valid = true;
 	temp.rgb = 0x30303000;
 
+	//Generate blank world
 	for (int y = 0; y < worldHeight; y++) {
 		for (int x = 0; x < worldWidth; x++) {
 			if (y < 10 || y > worldHeight - 11 || x < 10 || x > worldWidth - 11) {
@@ -23,6 +24,7 @@ void generateWorld() {
 
 /* Game Loop */
 
+//Handle user input and window functions
 void handleEvents() {
 	SDL_GetMouseState(&keys.mousex, &keys.mousey);													//get mouse locaiton
 	keys.mousex = (keys.mousex / ((double)game.window_width  / camera.width)) + camera.x;		
@@ -50,6 +52,9 @@ void handleEvents() {
 			}
 			else if (event.key.keysym.sym == SDLK_l) {										 // Toggle lighting
 				game.lighting = !game.lighting;
+			}
+			else if (event.key.keysym.sym == SDLK_p) {										 // Toggle FPS counter in console
+				game.FPSshow = !game.FPSshow;
 			}
 			else if (event.key.keysym.sym == SDLK_c) {
 				generateWorld();
@@ -164,6 +169,7 @@ void playerMove(){
 	camera.y = player.y - (camera.height / 2) + (player.size / 2);
 }
 
+//Handle painting
 void paint() {
 	if (game.painting) {
 		pixel temp;
@@ -189,16 +195,20 @@ void paint() {
 	}
 }
 
+//update game objects
 void update() {
 
 	playerMove();
 	paint();
 }
 
-
-bool validLine(int x0, int y0, int x1, int y1) {
+//Determine wether a path exists between to pixels
+int validLine(int x0, int y0, int x1, int y1) {
+	//Get distance
 	int dx = abs(x1 - x0);
 	int dy = abs(y1 - y0);
+
+	//Estimate movement 
 	int x = x0;
 	int y = y0;
 	int n = 1 + dx + dy;
@@ -208,7 +218,8 @@ bool validLine(int x0, int y0, int x1, int y1) {
 	dx *= 2;
 	dy *= 2;
 
-	for (; n > 0; --n){
+	//Step though movment to detect collision
+	for (; n > 1; --n){
 		if (foreground[y][x].valid) return false;
 
 		if (error > 0){
@@ -223,7 +234,7 @@ bool validLine(int x0, int y0, int x1, int y1) {
 	return true;
 }
 
-
+//Returns brightness or a pixel based on distance from lightsource
 float raytrace(int x0, int y0, int x1, int y1) {
 
 	float dist = calcDistance(x0, y0, x1, y1);
@@ -236,6 +247,7 @@ SDL_Window* window;						  // SDL2 window
 SDL_Renderer* renderer;					  // SDL2 renderer
 SDL_Texture* frame;					  // array of rgb pixel data
 
+//Render world to screen and lighting if option is on
 void render() {
 	void* data;
 	int pitch;
@@ -244,7 +256,7 @@ void render() {
 	// clear to black background
 	SDL_memset(data, 0, pitch * camera.height);
 
-	// transfer pixel data
+	// transfer pixel data to SDL texture object
 	int yPixel, xPixel;
 	for (int y = 0; y < camera.height; y++){
 
@@ -271,7 +283,9 @@ void render() {
 
 			Uint32 p = foreground[yPixel][xPixel].valid ? foreground[yPixel][xPixel].rgb : background[yPixel][xPixel];
 
+			//Render Lighting
 			if (game.lighting) {
+
 				p = rgbMult(p, raytrace(player.x + (player.size/2), player.y + (player.size / 2), xPixel, yPixel));
 			}
 			row[x] = p;
@@ -280,11 +294,13 @@ void render() {
 		
 	SDL_UnlockTexture(frame);
 
-	// copy to window
+	// Render SDL texture to window
 	SDL_RenderCopy(renderer, frame, NULL, NULL);
 	SDL_RenderPresent(renderer);
 }
 
+
+//Initialize game window and game functions
 void init(const char* title, int width, int height, bool fullscreen = false, bool hardwareAcceleration = false, bool vsync = false) {
 	game.window_width = width;
 	game.window_height = height;
@@ -305,6 +321,7 @@ void init(const char* title, int width, int height, bool fullscreen = false, boo
 	//instantiate game variables
 	game.lighting = false;
 	game.painting = false;
+	game.FPSshow = true;
 	game.unpainting = false;
 	game.brushSize = 10;
 
@@ -333,12 +350,14 @@ int main(int argc, char* argv[]) {
 		render();
 
 		// fps check
-		frame_time = SDL_GetTicks() - start_time;
-		fps = (frame_time > 0) ? 1000.0f / frame_time : 0.0f;
+		if (game.FPSshow) {
+			frame_time = SDL_GetTicks() - start_time;
+			fps = (frame_time > 0) ? 1000.0f / frame_time : 0.0f;
+			std::cout << fps << std::endl;
+		}
 
 		//display data
 		//std::cout << keys.mousex << ", " << keys.mousey<< std::endl;
-		std::cout << fps << std::endl;
 	}
 	
 	// exit
