@@ -1,2 +1,2 @@
 # pixelTestGame
-A interacitive 2D grahpics demo created using c++ and SDL2 showcasing CPU based raytracing and rendering
+An interactive 2D graphics demo I made to showcase CPU based raytraced lighting and CPU based rendering for an interactive 2D voxel implementation.
